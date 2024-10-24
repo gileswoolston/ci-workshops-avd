@@ -249,6 +249,9 @@ vlan internal order ascending range 1006 1199
 | ------- | ---- | ------------ |
 | 10 | Ten | - |
 | 20 | Twenty | - |
+| 110 | ESX_Hosts | - |
+| 120 | Storage_Servers | - |
+| 3099 | MLAG_iBGP_NewVRF | LEAF_PEER_L3 |
 | 4093 | LEAF_PEER_L3 | LEAF_PEER_L3 |
 | 4094 | MLAG_PEER | MLAG |
 
@@ -261,6 +264,16 @@ vlan 10
 !
 vlan 20
    name Twenty
+!
+vlan 110
+   name ESX_Hosts
+!
+vlan 120
+   name Storage_Servers
+!
+vlan 3099
+   name MLAG_iBGP_NewVRF
+   trunk group LEAF_PEER_L3
 !
 vlan 4093
    name LEAF_PEER_L3
@@ -282,10 +295,10 @@ vlan 4094
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
 | Ethernet1 | MLAG_PEER_s1-spine2_Ethernet1 | *trunk | *- | *- | *['LEAF_PEER_L3', 'MLAG'] | 1 |
-| Ethernet2 | S1-LEAF1_Ethernet2 | *trunk | *10 | *- | *- | 2 |
-| Ethernet3 | S1-LEAF2_Ethernet2 | *trunk | *10 | *- | *- | 2 |
-| Ethernet4 | S1-LEAF3_Ethernet2 | *trunk | *20 | *- | *- | 4 |
-| Ethernet5 | S1-LEAF4_Ethernet2 | *trunk | *20 | *- | *- | 4 |
+| Ethernet2 | S1-LEAF1_Ethernet2 | *trunk | *10,110 | *- | *- | 2 |
+| Ethernet3 | S1-LEAF2_Ethernet2 | *trunk | *10,110 | *- | *- | 2 |
+| Ethernet4 | S1-LEAF3_Ethernet2 | *trunk | *20,120 | *- | *- | 4 |
+| Ethernet5 | S1-LEAF4_Ethernet2 | *trunk | *20,120 | *- | *- | 4 |
 | Ethernet6 | MLAG_PEER_s1-spine2_Ethernet6 | *trunk | *- | *- | *['LEAF_PEER_L3', 'MLAG'] | 1 |
 
 *Inherited from Port-Channel Interface
@@ -359,8 +372,8 @@ interface Ethernet8
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
 | Port-Channel1 | MLAG_PEER_s1-spine2_Po1 | switched | trunk | - | - | ['LEAF_PEER_L3', 'MLAG'] | - | - | - | - |
-| Port-Channel2 | RACK1_Po2 | switched | trunk | 10 | - | - | - | - | 2 | - |
-| Port-Channel4 | RACK2_Po2 | switched | trunk | 20 | - | - | - | - | 4 | - |
+| Port-Channel2 | RACK1_Po2 | switched | trunk | 10,110 | - | - | - | - | 2 | - |
+| Port-Channel4 | RACK2_Po2 | switched | trunk | 20,120 | - | - | - | - | 4 | - |
 
 #### Port-Channel Interfaces Device Configuration
 
@@ -378,7 +391,7 @@ interface Port-Channel2
    description RACK1_Po2
    no shutdown
    switchport
-   switchport trunk allowed vlan 10
+   switchport trunk allowed vlan 10,110
    switchport mode trunk
    mlag 2
 !
@@ -386,7 +399,7 @@ interface Port-Channel4
    description RACK2_Po2
    no shutdown
    switchport
-   switchport trunk allowed vlan 20
+   switchport trunk allowed vlan 20,120
    switchport mode trunk
    mlag 4
 ```
@@ -426,6 +439,9 @@ interface Loopback0
 | --------- | ----------- | --- | ---- | -------- |
 | Vlan10 | Ten | default | - | False |
 | Vlan20 | Twenty | default | - | False |
+| Vlan110 | ESX_Hosts | NewVRF | - | False |
+| Vlan120 | Storage_Servers | NewVRF | - | False |
+| Vlan3099 | MLAG_PEER_L3_iBGP: vrf NewVRF | NewVRF | 1500 | False |
 | Vlan4093 | MLAG_PEER_L3_PEERING | default | 1500 | False |
 | Vlan4094 | MLAG_PEER | default | 1500 | False |
 
@@ -435,6 +451,9 @@ interface Loopback0
 | --------- | --- | ---------- | ------------------ | ------------------------- | ---- | ------ | ------- |
 | Vlan10 |  default  |  10.10.10.2/24  |  -  |  10.10.10.1  |  -  |  -  |  -  |
 | Vlan20 |  default  |  10.20.20.2/24  |  -  |  10.20.20.1  |  -  |  -  |  -  |
+| Vlan110 |  NewVRF  |  10.10.110.2/24  |  -  |  10.10.110.1  |  -  |  -  |  -  |
+| Vlan120 |  NewVRF  |  10.20.120.2/24  |  -  |  10.20.120.1  |  -  |  -  |  -  |
+| Vlan3099 |  NewVRF  |  10.1.253.2/31  |  -  |  -  |  -  |  -  |  -  |
 | Vlan4093 |  default  |  10.1.253.2/31  |  -  |  -  |  -  |  -  |  -  |
 | Vlan4094 |  default  |  10.1.253.0/31  |  -  |  -  |  -  |  -  |  -  |
 
@@ -453,6 +472,27 @@ interface Vlan20
    no shutdown
    ip address 10.20.20.2/24
    ip virtual-router address 10.20.20.1
+!
+interface Vlan110
+   description ESX_Hosts
+   no shutdown
+   vrf NewVRF
+   ip address 10.10.110.2/24
+   ip virtual-router address 10.10.110.1
+!
+interface Vlan120
+   description Storage_Servers
+   no shutdown
+   vrf NewVRF
+   ip address 10.20.120.2/24
+   ip virtual-router address 10.20.120.1
+!
+interface Vlan3099
+   description MLAG_PEER_L3_iBGP: vrf NewVRF
+   no shutdown
+   mtu 1500
+   vrf NewVRF
+   ip address 10.1.253.2/31
 !
 interface Vlan4093
    description MLAG_PEER_L3_PEERING
@@ -501,12 +541,14 @@ ip virtual-router mac-address 00:1c:73:00:dc:01
 | VRF | Routing Enabled |
 | --- | --------------- |
 | default | True |
+| NewVRF | True |
 
 #### IP Routing Device Configuration
 
 ```eos
 !
 ip routing
+ip routing vrf NewVRF
 ```
 
 ### IPv6 Routing
@@ -517,6 +559,7 @@ ip routing
 | --- | --------------- |
 | default | False |
 | default | false |
+| NewVRF | false |
 
 ### Static Routes
 
@@ -591,8 +634,11 @@ router ospf 100
 
 | VRF Name | IP Routing |
 | -------- | ---------- |
+| NewVRF | enabled |
 
 ### VRF Instances Device Configuration
 
 ```eos
+!
+vrf instance NewVRF
 ```

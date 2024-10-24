@@ -27,6 +27,9 @@ local_users:
 vrfs:
 - name: default
   ip_routing: false
+- name: NewVRF
+  tenant: MY_FABRIC
+  ip_routing: true
 management_interfaces:
 - name: Management0
   description: oob_management
@@ -55,6 +58,17 @@ vlans:
   tenant: MY_FABRIC
 - id: 20
   name: Twenty
+  tenant: MY_FABRIC
+- id: 110
+  name: ESX_Hosts
+  tenant: MY_FABRIC
+- id: 120
+  name: Storage_Servers
+  tenant: MY_FABRIC
+- id: 3099
+  name: MLAG_iBGP_NewVRF
+  trunk_groups:
+  - LEAF_PEER_L3
   tenant: MY_FABRIC
 vlan_interfaces:
 - name: Vlan4093
@@ -88,6 +102,34 @@ vlan_interfaces:
   ip_address: 10.20.20.3/24
   ip_virtual_router_addresses:
   - 10.20.20.1
+- name: Vlan110
+  tenant: MY_FABRIC
+  tags:
+  - ESX
+  description: ESX_Hosts
+  shutdown: false
+  ip_address: 10.10.110.3/24
+  ip_virtual_router_addresses:
+  - 10.10.110.1
+  vrf: NewVRF
+- name: Vlan120
+  tenant: MY_FABRIC
+  tags:
+  - Storage
+  description: Storage_Servers
+  shutdown: false
+  ip_address: 10.20.120.3/24
+  ip_virtual_router_addresses:
+  - 10.20.120.1
+  vrf: NewVRF
+- name: Vlan3099
+  tenant: MY_FABRIC
+  type: underlay_peering
+  shutdown: false
+  description: 'MLAG_PEER_L3_iBGP: vrf NewVRF'
+  vrf: NewVRF
+  mtu: 1500
+  ip_address: 10.1.253.3/31
 port_channel_interfaces:
 - name: Port-Channel1
   description: MLAG_PEER_s1-spine1_Po1
@@ -102,14 +144,14 @@ port_channel_interfaces:
   type: switched
   shutdown: false
   mode: trunk
-  vlans: '10'
+  vlans: 10,110
   mlag: 2
 - name: Port-Channel4
   description: RACK2_Po2
   type: switched
   shutdown: false
   mode: trunk
-  vlans: '20'
+  vlans: 20,120
   mlag: 4
 ethernet_interfaces:
 - name: Ethernet1

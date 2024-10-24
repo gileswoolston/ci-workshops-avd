@@ -9,6 +9,19 @@ port_profiles:
     mode: "access"
     vlans: "20"
     spanning_tree_portfast: edge
+  
+  - profile: PP-VLAN110
+    mode: "access"
+    description: "ESXI Host"
+    vlans: "110"
+    spanning_tree_portfast: edge
+
+  - profile: PP-VLAN120
+    mode: "access"
+    description: "Storage Host"
+    vlans: "120"
+    spanning_tree_portfast: edge
+
 
 ###########################################################
 # ---------------- Endpoint Connectivity ---------------- #
@@ -30,6 +43,14 @@ servers:
         port_channel:
           mode: active
 
+      - endpoint_ports: [ eth3, eth4 ]                  # Server port to connect (optional)
+        switch_ports: [ Ethernet7, Ethernet7 ]          # Switch port to connect server (required)
+        switches: [ s1-leaf1, s1-leaf2 ]                # Switch to connect server (required)
+        profile: PP-VLAN110                              # Port profile to apply (required)
+        port_channel:
+          mode: active
+
+
 # # --------------------------------------------------------#
 # # Site1 RACK2 Endpoints
 # # --------------------------------------------------------#
@@ -41,5 +62,12 @@ servers:
         switch_ports: [ Ethernet4, Ethernet4 ]          # Switch port to connect server (required)
         switches: [ s1-leaf3, s1-leaf4 ]                # Switch to connect server (required)
         profile: PP-VLAN20                              # Port profile to apply (required)
+        port_channel:
+          mode: active
+
+      - endpoint_ports: [ eth3, eth4 ]                  # Server port to connect (optional)
+        switch_ports: [ Ethernet8, Ethernet8 ]          # Switch port to connect server (required)
+        switches: [ s1-leaf1, s1-leaf2 ]                # Switch to connect server (required)
+        profile: PP-VLAN120                              # Port profile to apply (required)
         port_channel:
           mode: active

@@ -245,6 +245,7 @@ vlan internal order ascending range 1006 1199
 | VLAN ID | Name | Trunk Groups |
 | ------- | ---- | ------------ |
 | 10 | Ten | - |
+| 110 | ESX_Hosts | - |
 | 4094 | MLAG_PEER | MLAG |
 
 ### VLANs Device Configuration
@@ -253,6 +254,9 @@ vlan internal order ascending range 1006 1199
 !
 vlan 10
    name Ten
+!
+vlan 110
+   name ESX_Hosts
 !
 vlan 4094
    name MLAG_PEER
@@ -270,10 +274,12 @@ vlan 4094
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
 | Ethernet1 | MLAG_PEER_s1-leaf1_Ethernet1 | *trunk | *- | *- | *['MLAG'] | 1 |
-| Ethernet2 | S1-SPINE1_Ethernet3 | *trunk | *10 | *- | *- | 2 |
-| Ethernet3 | S1-SPINE2_Ethernet3 | *trunk | *10 | *- | *- | 2 |
+| Ethernet2 | S1-SPINE1_Ethernet3 | *trunk | *10,110 | *- | *- | 2 |
+| Ethernet3 | S1-SPINE2_Ethernet3 | *trunk | *10,110 | *- | *- | 2 |
 | Ethernet4 | s1-host1_eth2 | *access | *10 | *- | *- | 4 |
 | Ethernet6 | MLAG_PEER_s1-leaf1_Ethernet6 | *trunk | *- | *- | *['MLAG'] | 1 |
+| Ethernet7 | ESXI Host | *access | *110 | *- | *- | 7 |
+| Ethernet8 | Storage Host | *access | *120 | *- | *- | 8 |
 
 *Inherited from Port-Channel Interface
 
@@ -305,6 +311,16 @@ interface Ethernet6
    description MLAG_PEER_s1-leaf1_Ethernet6
    no shutdown
    channel-group 1 mode active
+!
+interface Ethernet7
+   description ESXI Host
+   no shutdown
+   channel-group 7 mode active
+!
+interface Ethernet8
+   description Storage Host
+   no shutdown
+   channel-group 8 mode active
 ```
 
 ### Port-Channel Interfaces
@@ -316,8 +332,10 @@ interface Ethernet6
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
 | Port-Channel1 | MLAG_PEER_s1-leaf1_Po1 | switched | trunk | - | - | ['MLAG'] | - | - | - | - |
-| Port-Channel2 | SPINES_Po2 | switched | trunk | 10 | - | - | - | - | 2 | - |
+| Port-Channel2 | SPINES_Po2 | switched | trunk | 10,110 | - | - | - | - | 2 | - |
 | Port-Channel4 | s1-host1 | switched | access | 10 | - | - | - | - | 4 | - |
+| Port-Channel7 | ESXI Host | switched | access | 110 | - | - | - | - | 7 | - |
+| Port-Channel8 | Storage Host | switched | access | 120 | - | - | - | - | 8 | - |
 
 #### Port-Channel Interfaces Device Configuration
 
@@ -334,7 +352,7 @@ interface Port-Channel2
    description SPINES_Po2
    no shutdown
    switchport
-   switchport trunk allowed vlan 10
+   switchport trunk allowed vlan 10,110
    switchport mode trunk
    mlag 2
 !
@@ -344,6 +362,22 @@ interface Port-Channel4
    switchport
    switchport access vlan 10
    mlag 4
+   spanning-tree portfast
+!
+interface Port-Channel7
+   description ESXI Host
+   no shutdown
+   switchport
+   switchport access vlan 110
+   mlag 7
+   spanning-tree portfast
+!
+interface Port-Channel8
+   description Storage Host
+   no shutdown
+   switchport
+   switchport access vlan 120
+   mlag 8
    spanning-tree portfast
 ```
 

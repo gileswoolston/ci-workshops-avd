@@ -44,7 +44,7 @@ leaf:
   node_groups:
     - group: RACK1
       filter:
-        tags: [ "Web" ]
+        tags: [ "Web", "ESX" ]
       nodes:
         - name: s1-leaf1
           id: 1
@@ -56,7 +56,7 @@ leaf:
           uplink_switch_interfaces: [ Ethernet3, Ethernet3 ]
     - group: RACK2
       filter:
-        tags: [ "App" ]
+        tags: [ "App", "Storage" ]
       nodes:
         - name: s1-leaf3
           id: 3

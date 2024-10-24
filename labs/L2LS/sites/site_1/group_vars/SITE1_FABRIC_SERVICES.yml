@@ -26,3 +26,29 @@ tenants:
                 ip_address: 10.20.20.2/24
               - node: s1-spine2
                 ip_address: 10.20.20.3/24
+
+      - name: NewVRF
+        vrf_id: 100
+        svis:
+          - id: 110
+            name: 'ESX_Hosts'
+            tags: [ "ESX" ]
+            enabled: true
+            ip_virtual_router_addresses:
+              - 10.10.110.1
+            nodes:
+              - node: s1-spine1
+                ip_address: 10.10.110.2/24
+              - node: s1-spine2
+                ip_address: 10.10.110.3/24
+          - id: 120
+            name: 'Storage_Servers'
+            tags: [ "Storage" ]
+            enabled: true
+            ip_virtual_router_addresses:
+              - 10.20.120.1
+            nodes:
+              - node: s1-spine1
+                ip_address: 10.20.120.2/24
+              - node: s1-spine2
+                ip_address: 10.20.120.3/24

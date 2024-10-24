@@ -245,6 +245,7 @@ vlan internal order ascending range 1006 1199
 | VLAN ID | Name | Trunk Groups |
 | ------- | ---- | ------------ |
 | 20 | Twenty | - |
+| 120 | Storage_Servers | - |
 | 4094 | MLAG_PEER | MLAG |
 
 ### VLANs Device Configuration
@@ -253,6 +254,9 @@ vlan internal order ascending range 1006 1199
 !
 vlan 20
    name Twenty
+!
+vlan 120
+   name Storage_Servers
 !
 vlan 4094
    name MLAG_PEER
@@ -270,8 +274,8 @@ vlan 4094
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
 | Ethernet1 | MLAG_PEER_s1-leaf4_Ethernet1 | *trunk | *- | *- | *['MLAG'] | 1 |
-| Ethernet2 | S1-SPINE1_Ethernet4 | *trunk | *20 | *- | *- | 2 |
-| Ethernet3 | S1-SPINE2_Ethernet4 | *trunk | *20 | *- | *- | 2 |
+| Ethernet2 | S1-SPINE1_Ethernet4 | *trunk | *20,120 | *- | *- | 2 |
+| Ethernet3 | S1-SPINE2_Ethernet4 | *trunk | *20,120 | *- | *- | 2 |
 | Ethernet4 | s1-host2_eth1 | *access | *20 | *- | *- | 4 |
 | Ethernet6 | MLAG_PEER_s1-leaf4_Ethernet6 | *trunk | *- | *- | *['MLAG'] | 1 |
 
@@ -316,7 +320,7 @@ interface Ethernet6
 | Interface | Description | Type | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
 | Port-Channel1 | MLAG_PEER_s1-leaf4_Po1 | switched | trunk | - | - | ['MLAG'] | - | - | - | - |
-| Port-Channel2 | SPINES_Po4 | switched | trunk | 20 | - | - | - | - | 2 | - |
+| Port-Channel2 | SPINES_Po4 | switched | trunk | 20,120 | - | - | - | - | 2 | - |
 | Port-Channel4 | s1-host2 | switched | access | 20 | - | - | - | - | 4 | - |
 
 #### Port-Channel Interfaces Device Configuration
@@ -334,7 +338,7 @@ interface Port-Channel2
    description SPINES_Po4
    no shutdown
    switchport
-   switchport trunk allowed vlan 20
+   switchport trunk allowed vlan 20,120
    switchport mode trunk
    mlag 2
 !

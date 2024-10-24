@@ -47,6 +47,9 @@ vlans:
 - id: 10
   name: Ten
   tenant: MY_FABRIC
+- id: 110
+  name: ESX_Hosts
+  tenant: MY_FABRIC
 vlan_interfaces:
 - name: Vlan4094
   description: MLAG_PEER
@@ -67,7 +70,7 @@ port_channel_interfaces:
   type: switched
   shutdown: false
   mode: trunk
-  vlans: '10'
+  vlans: 10,110
   mlag: 2
 - name: Port-Channel4
   description: s1-host1
@@ -77,6 +80,22 @@ port_channel_interfaces:
   vlans: '10'
   spanning_tree_portfast: edge
   mlag: 4
+- name: Port-Channel7
+  description: ESXI Host
+  type: switched
+  shutdown: false
+  mode: access
+  vlans: '110'
+  spanning_tree_portfast: edge
+  mlag: 7
+- name: Port-Channel8
+  description: Storage Host
+  type: switched
+  shutdown: false
+  mode: access
+  vlans: '120'
+  spanning_tree_portfast: edge
+  mlag: 8
 ethernet_interfaces:
 - name: Ethernet1
   peer: s1-leaf2
@@ -128,6 +147,28 @@ ethernet_interfaces:
   type: port-channel-member
   channel_group:
     id: 4
+    mode: active
+- name: Ethernet7
+  peer: s1-host1
+  peer_interface: eth3
+  peer_type: server
+  port_profile: PP-VLAN110
+  description: ESXI Host
+  shutdown: false
+  type: port-channel-member
+  channel_group:
+    id: 7
+    mode: active
+- name: Ethernet8
+  peer: s1-host2
+  peer_interface: eth3
+  peer_type: server
+  port_profile: PP-VLAN120
+  description: Storage Host
+  shutdown: false
+  type: port-channel-member
+  channel_group:
+    id: 8
     mode: active
 mlag_configuration:
   domain_id: RACK1
